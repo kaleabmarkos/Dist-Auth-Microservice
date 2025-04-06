@@ -46,3 +46,32 @@ func Register(w http.ResponseWriter, r *http.Request){
 	json.NewEncoder(w).Encode(user)
 
 }
+
+func Login(w http.ResponseWriter, r *http.Request){
+	var input AuthInput
+
+	json.NewDecoder(r.Body).Decode(&input)
+
+	collection := db.GetCollection("user")
+
+	var user models.User
+
+	err := collection.FindOne(context.TODO(), bson.M{"email":input.Email}).Decode(&user)
+	if err !=nil{
+		http.Error(w, "User doesn't exist", http.StatusBadRequest)
+		return 
+	}
+
+	if !utils.CheckPassword(input.Password, user.Password){
+		http.Error(w, "Wrong Password", http.StatusUnauthorized)
+		return
+	}
+
+	accessToken, _ := utils.GenerateToken(user.ID.Hex())
+	refershToken, _ := utils.GenerateRefreshToken(user.ID.Hex())
+
+	json.NewEncoder(w).Encode(map[string]string{
+		"access_token" : accessToken,
+		"refresh_token" : refershToken,
+	})
+}
