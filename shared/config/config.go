@@ -1,6 +1,6 @@
 package config
 
-import ("os"
+import (
 		"log"
 		"github.com/joho/godotenv"
 )

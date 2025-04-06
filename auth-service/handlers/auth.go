@@ -4,11 +4,8 @@ import (
 	"Dist-Auth-MicroService/auth-service/models"
 	"Dist-Auth-MicroService/auth-service/utils"
 	"Dist-Auth-MicroService/shared/db"
-	"auth-service/models"
-	"auth-service/utils"
 	"context"
 	"encoding/json"
-	"go/printer"
 	"net/http"
 
 	"go.mongodb.org/mongo-driver/bson"
