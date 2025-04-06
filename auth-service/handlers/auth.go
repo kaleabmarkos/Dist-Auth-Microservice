@@ -58,12 +58,12 @@ func Login(w http.ResponseWriter, r *http.Request){
 
 	err := collection.FindOne(context.TODO(), bson.M{"email":input.Email}).Decode(&user)
 	if err !=nil{
-		http.Error(w, "User doesn't exist", http.StatusBadRequest)
+		http.Error(w, "Wrong Credentials", http.StatusBadRequest)
 		return 
 	}
 
 	if !utils.CheckPassword(input.Password, user.Password){
-		http.Error(w, "Wrong Password", http.StatusUnauthorized)
+		http.Error(w, "Wrong Credentials", http.StatusUnauthorized)
 		return
 	}
 
