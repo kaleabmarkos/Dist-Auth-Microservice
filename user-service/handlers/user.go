@@ -30,7 +30,23 @@ func CreateUser(w http.ResponseWriter, r *http.Request){
 }
 
 func GetUserById(w http.ResponseWriter, r *http.Request){
+	idParam := chi.URLParam(r, "id")
+	objectID, err := primitive.ObjectIDFromHex(idParam)
+	if err!=nil{
+		http.Error(w, "Invalid ID", http.StatusBadRequest)
+		return
+	}
 
+	collection := db.GetCollection("users")
+	var user models.User
+
+	err = collection.FindOne(context.TODO(), bson.M{"id": objectID}).Decode(&user)
+	if err!=nil{
+		http.Error(w, "User not found", http.StatusBadRequest)
+		return
+	}
+
+	json.NewEncoder(w).Encode(user)
 
 }
 
