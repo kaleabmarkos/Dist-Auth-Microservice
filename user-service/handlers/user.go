@@ -51,6 +51,28 @@ func GetUserById(w http.ResponseWriter, r *http.Request){
 }
 
 func UpdateUserRole(w http.ResponseWriter, r *http.Request){
+	idParam := chi.URLParam(r, "id")
+	objectID, err := primitive.ObjectIDFromHex(idParam)
+	if err!=nil{
+		http.Error(w, "Invalid ID", http.StatusBadRequest)
+		return
+	}
 
+	var payload struct{
+		Role	string	`json: "role"`
+	}
+
+	json.NewDecoder(r.Body).Decode(&payload)
+
+	collection := db.GetCollection("users")
+	_, err = collection.UpdateOne(context.TODO(),
+		bson.M{"id":objectID},
+		bson.M{"$set": bson.M{"role": payload.Role}})
+	if err!=nil{
+		http.Error(w, "Falied to update Role. ", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
 
 }
