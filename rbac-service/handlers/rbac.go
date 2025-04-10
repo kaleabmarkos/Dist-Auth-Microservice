@@ -46,3 +46,31 @@ func GetRole(w http.ResponseWriter, r *http.Request){
 	json.NewEncoder(w).Encode(role)
 
 }
+
+func CheckPermission(w http.ResponseWriter, r *http.Request){
+	var req struct{
+		Role		string	`json: "role"`
+		Permission	string	`json: "permission"`
+	}
+
+	var role models.Role
+	json.NewDecoder(r.Body).Decode(&req)
+
+	collection := db.GetCollection("roles")
+
+	err := collection.FindOne(context.TODO(), bson.M{"name": req.Role}).Decode(&role)
+	if err != nil{
+		http.Error(w, "Role not found", http.StatusNotFound)
+		return
+	}
+
+	for _,perm := range role.Permissions{
+		if perm == req.Permission{
+			json.NewEncoder(w).Encode(map[string]bool{"allowed": true})
+			return
+		}
+	}
+
+	json.NewEncoder(w).Encode(map[string]bool{"allowed":false})
+
+}
